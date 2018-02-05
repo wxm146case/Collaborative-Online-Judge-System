@@ -1,15 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Problem } from '../models/problem.model';
-import { PROBLEMS } from '../mock-problems';
+import { HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
+import { Observable } from 'rxjs/Rx';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class DataService {
-  problems: Problem[] = PROBLEMS;
+  private _problemSource = new BehaviorSubject<Problem[]>([]);
 
-  constructor() { }
+  constructor(private http:HttpClient) { }
 
-  getProblems(): Problem[] {
-    return this.problems;
+  getProblems(): Observable<Problem[]> {
+    this.httpClient.get('api/v1/problems')
+    .toPromise()
+    .then(res: any) => {
+      
+    }
   }
 
   getProblem(id: number): Problem {
