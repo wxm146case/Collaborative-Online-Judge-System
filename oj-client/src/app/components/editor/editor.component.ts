@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CollaborationService } from '../../services/collaboration.service';
 import { ActivatedRoute, Params } from '@angular/router';
+import { DataService } from '../../services/data.service';
+import { Subscription } from 'rxjs/Subscription';
 
 declare var ace: any;
 
@@ -15,9 +17,14 @@ export class EditorComponent implements OnInit {
   sessionId: string;
 
   editor: any;
+  output: string = '';
+  
+  users: string;
+  subscriptionUsers: Subscription;
 
   constructor(private collaboration: CollaborationService,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              private dataService: DataService) { }
 
   defaultContent = {
     'Java': `public class Example {
@@ -37,6 +44,7 @@ export class EditorComponent implements OnInit {
       .subscribe(params => {
         this.sessionId = params['id'];
         this.initEditor();
+        this.collaboration.restoreBuffer();
       });
     }
 
@@ -47,6 +55,7 @@ export class EditorComponent implements OnInit {
 
     // setup collaboration socket
     this.collaboration.init(this.editor, this.sessionId);
+
     this.editor.lastAppliedChange = null;
     
     // registrer change callback
@@ -56,7 +65,6 @@ export class EditorComponent implements OnInit {
         this.collaboration.change(JSON.stringify(e));
       }
     })
- 
   }
 
   // reset editor content
@@ -76,6 +84,17 @@ export class EditorComponent implements OnInit {
   submit(): void {
     let user_code = this.editor.getValue();
     console.log(user_code);
+
+    const data = {
+      user_code: user_code,
+      lang: this.language.toLocaleLowerCase()
+    };
+
+    this.dataService.buildAndRun(data)
+      .then(res => {
+        this.output = res; 
+        console.log(this.output); 
+      });
   }
 
 }

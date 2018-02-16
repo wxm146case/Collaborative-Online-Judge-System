@@ -23,4 +23,10 @@ export class CollaborationService {
   change(delta: string): void {
     this.collaborationSocket.emit("change", delta);
   }
-}
+
+    // send restoreBuffer request to server
+    restoreBuffer(): void {
+      this.collaborationSocket.emit("restoreBuffer");
+    }
+  }
+

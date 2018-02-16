@@ -7,7 +7,7 @@ import { Problem } from '../models/problem.model';
 
 @Injectable()
 export class DataService {
-  
+  //problems: Problem[] = PROBLEMS;
   private _problemSource = new BehaviorSubject<Problem[]>([]);
 
   constructor(private httpClient: HttpClient) { }
@@ -24,7 +24,7 @@ export class DataService {
   }
 
   getProblem(id: number): Promise<Problem> {
-    
+    //return this.problems.find( (problem) => problem.id === id );
     return this.httpClient.get(`api/v1/problems/${id}`)
       .toPromise()
       .then((res: any) => res)
@@ -32,7 +32,8 @@ export class DataService {
   }
 
   addProblem(problem: Problem) {
-    
+    // problem.id = this.problems.length + 1;
+    // this.problems.push(problem);
     const options = { headers: new HttpHeaders({ 'Content-Type': 'application/json'})};
     return this.httpClient.post('api/v1/problems', problem, options)
       .toPromise()
@@ -42,6 +43,18 @@ export class DataService {
         return res;
       })
       .catch(this.handleError);    
+  }
+
+  buildAndRun(data) : Promise<any> {
+    const options = {headers: new HttpHeaders({'Content-Type': 'application/json'})};
+
+    return this.httpClient.post('api/v1/build_and_run', data, options)
+      .toPromise()
+      .then(res => {
+        console.log(res);
+        return res;
+      })
+      .catch(this.handleError);
   }
 
   private handleError(error: any): Promise<any> {
